@@ -1,0 +1,15 @@
+library(sqldf)
+library(dplyr)
+data <- read.csv.sql("household_power_consumption.txt","select * from file where 
+                                     Date = '1/2/2007' or Date = '2/2/2007' ",sep=";")
+data <- tbl_df(data)
+data$Date <- as.Date(data$Date, format = "%d/%m/%Y")
+data$datetime <- strptime(paste(data$Date, data$Time), format = "%Y-%m-%d %H:%M:%S")
+my_data <- select(data, datetime, Global_active_power:Sub_metering_3)
+
+dev.copy(png, file = "plot3.png")
+plot(my_data$datetime, my_data$Sub_metering_1, type = "l", col = "black", xlab = "", ylab = "Energy sub metering")
+lines(my_data$datetime, my_data$Sub_metering_2, col = "red")
+lines(my_data$datetime, my_data$Sub_metering_3, col = "blue")
+legend("topright", lty=c(1,1,1), col = c("black", "red", "blue"), legend=c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"))
+dev.off()
